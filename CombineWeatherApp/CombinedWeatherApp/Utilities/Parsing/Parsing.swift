@@ -26,3 +26,17 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
+import Foundation
+import Combine
+
+func decode<T: Decodable>(_ data: Data) -> AnyPublisher<T, WeatherError> {
+  let decoder = JSONDecoder()
+  decoder.dataDecodingStrategy = .base64
+  
+  return Just(data)
+    .decode(type: T.self, decoder: decoder)
+    .mapError { error in
+        .parsing(description: error.localizedDescription)
+    }
+    .eraseToAnyPublisher()
+}

@@ -29,11 +29,42 @@
 import Foundation
 import Combine
 
+protocol WeatherFetchable {
+  func weaklyWeatherForecast(forCity city: String) -> AnyPublisher<WeeklyForecastResponse, WeatherError>
+  func currentWeatherForcaset(forCity city: String) -> AnyPublisher<CurrentWeatherForecastResponse, WeatherError>
+}
+
 class WeatherFetcher {
   private let session: URLSession
   
   init(session: URLSession = .shared) {
     self.session = session
+  }
+}
+
+extension WeatherFetcher: WeatherFetchable {
+  func weaklyWeatherForecast(forCity city: String) -> AnyPublisher<WeeklyForecastResponse, WeatherError> {
+    return forecast(with: makeWeeklyForecastComponents(withCity: city))
+  }
+  
+  func currentWeatherForcaset(forCity city: String) -> AnyPublisher<CurrentWeatherForecastResponse, WeatherError> {
+    return forecast(with: makeCurrentDayForecastComponents(withCity: city))
+  }
+  
+  private func forecast<T>(with components: URLComponents) -> AnyPublisher<T, WeatherError> where T: Decodable {
+    guard let url = components.url else {
+      let error = WeatherError.network(description: "URL을 만들 수 없음")
+      return Fail(error: error).eraseToAnyPublisher()
+    }
+    
+    return session.dataTaskPublisher(for: URLRequest(url: url))
+      .mapError { error in
+          .network(description: error.localizedDescription)
+      }
+      .flatMap(maxPublishers: .max(1)) { pair in
+        decode(pair.data)
+      }
+      .eraseToAnyPublisher()
   }
 }
 
