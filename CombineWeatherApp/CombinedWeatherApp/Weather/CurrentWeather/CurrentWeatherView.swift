@@ -29,7 +29,35 @@
 import SwiftUI
 
 struct CurrentWeatherView: View {
+  @ObservedObject var viewModel: CurrentlyWeatherViewModel
+  
+  init(viewModel: CurrentlyWeatherViewModel) {
+    self.viewModel = viewModel
+  }
+  
   var body: some View {
-    Text("Seems like a lovely day 😎")
+    List(content: content)
+      .onAppear { viewModel.refresh() }
+      .navigationTitle(viewModel.city)
+      .listStyle(GroupedListStyle())
+  }
+}
+
+private extension CurrentWeatherView {
+  func content() -> some View {
+    if let viewModel = viewModel.dataSource {
+      return AnyView(details(for: viewModel))
+    } else {
+      return AnyView(loading)
+    }
+  }
+  
+  func details(for viewModel: CurrentWeatherRowViewModel) -> some View {
+    CurrentWeatherRow(viewModel: viewModel)
+  }
+  
+  var loading: some View {
+    Text("Loading \(viewModel.city)'s weather...")
+      .foregroundColor(.gray)
   }
 }

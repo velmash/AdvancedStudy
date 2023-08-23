@@ -26,3 +26,11 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
+import SwiftUI
+
+enum WeeklyWeatherbuilder {
+  static func makeCurrentWeatherView(withCity city: String, weatherFecther: WeatherFetchable) -> some View {
+    let viewModel = CurrentlyWeatherViewModel(city: city, weatherFetcher: weatherFecther)
+    return CurrentWeatherView(viewModel: viewModel)
+  }
+}
