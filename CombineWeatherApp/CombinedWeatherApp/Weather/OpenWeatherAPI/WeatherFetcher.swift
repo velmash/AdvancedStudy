@@ -30,7 +30,7 @@ import Foundation
 import Combine
 
 protocol WeatherFetchable {
-  func weaklyWeatherForecast(forCity city: String) -> AnyPublisher<WeeklyForecastResponse, WeatherError>
+  func weeklyWeatherForecast(forCity city: String) -> AnyPublisher<WeeklyForecastResponse, WeatherError>
   func currentWeatherForcaset(forCity city: String) -> AnyPublisher<CurrentWeatherForecastResponse, WeatherError>
 }
 
@@ -43,7 +43,7 @@ class WeatherFetcher {
 }
 
 extension WeatherFetcher: WeatherFetchable {
-  func weaklyWeatherForecast(forCity city: String) -> AnyPublisher<WeeklyForecastResponse, WeatherError> {
+  func weeklyWeatherForecast(forCity city: String) -> AnyPublisher<WeeklyForecastResponse, WeatherError> {
     return forecast(with: makeWeeklyForecastComponents(withCity: city))
   }
   
